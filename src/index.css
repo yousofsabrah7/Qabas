@@ -1,1 +1,4 @@
 @import "tailwindcss";
+@theme{
+    --color-yellow-normal:#B8943F;
+}
