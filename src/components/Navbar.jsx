@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, Menu, X } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import qabasLogo from "../assets/qabas logo 2.svg";
 
 function Navbar() {
     const navLinks = [
@@ -20,7 +21,7 @@ function Navbar() {
             {/* Logo */}
             <div className="rightSide">
                 <img
-                    src="/src/assets/image.png"
+                    src={qabasLogo}
                     alt="Qabas Logo"
                     className="w-[120px] md:w-[165px] h-[92.813px] shrink-0 object-contain"
                 />
