@@ -1,5 +1,5 @@
-import React from "react";
-import { ArrowLeft } from "lucide-react";
+import React, { useState } from "react";
+import { ArrowLeft, Menu, X } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 function Navbar() {
@@ -10,24 +10,31 @@ function Navbar() {
         { name: "الشركاء", path: "/partners" },
         { name: "تواصل", path: "/contact" },
     ];
-
+    const [isOpen, setIsOpen] = useState(false);
     return (
         <nav
             dir="rtl"
-            className="flex items-center justify-between px-8"
+            className=" relative flex items-center justify-between px-8 "
         >
+
             {/* Logo */}
             <div className="rightSide">
                 <img
                     src="/src/assets/image.png"
                     alt="Qabas Logo"
-                    className="w-[165px] h-[92.813px] shrink-0 object-contain"
+                    className="w-[120px] md:w-[165px] h-[92.813px] shrink-0 object-contain"
                 />
             </div>
 
             {/* Links */}
             <div className="leftSide flex items-center">
-                <ul className="flex items-center gap-8">
+                <button className="md:hidden " 
+                onClick={() => { setIsOpen(!isOpen) }}
+                aria-label={isOpen ? "إغلاق القائمة" : "فتح القائمة"}
+                >
+                    {isOpen ? <X size={28} /> : <Menu size={28} />}
+                </button>
+                <ul className="hidden md:flex items-center gap-8">
                     {navLinks.map((link) => (
                         <li key={link.path}>
                             <NavLink
@@ -64,6 +71,40 @@ function Navbar() {
                     </li>
                 </ul>
             </div>
+            {/* Mobile Menu */}
+            {isOpen && (
+                <div className="absolute z-50  top-full right-0 w-full bg-white md:hidden">
+                    <ul className="flex flex-col items-end gap-4 mx-8 py-6">
+                        {navLinks.map((link) => (
+                            <li key={link.path}>
+                                <NavLink
+                                    to={link.path}
+                                    onClick={() => setIsOpen(false)}
+                                    className={({ isActive }) =>
+                                        `block p-2 border-b-2 transition-colors duration-300 ${isActive
+                                            ? "border-yellow-normal"
+                                            : "border-transparent hover:border-yellow-normal"
+                                        }`
+                                    }
+                                >
+                                    {link.name}
+                                </NavLink>
+                            </li>
+                        ))}
+
+                        <li>
+                            <NavLink
+                                to="/joinUs"
+                                onClick={() => setIsOpen(false)}
+                                className="flex items-center gap-3 bg-yellow-normal rounded-3xl px-8 py-3"
+                            >
+                                ابدأ رحلتك
+                                <ArrowLeft size={20} />
+                            </NavLink>
+                        </li>
+                    </ul>
+                </div>
+            )}
         </nav>
     );
 }
