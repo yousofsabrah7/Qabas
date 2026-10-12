@@ -2,7 +2,7 @@ import React from "react";
 import GoldButton from "./GoldButton";
 import SectionHeading from "./SectionHeading";
 import ProjectCard from "./ProjectCard";
-import { projects as projectItems } from "../../data/homeData";
+import { projects as projectItems } from "../../Data/HomeData";
 
 export default function HomeProjects() {
   return (

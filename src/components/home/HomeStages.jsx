@@ -2,7 +2,7 @@ import React from "react";
 import GoldButton from "./GoldButton";
 import StageCard from "./StageCard";
 import SectionHeading from "./SectionHeading";
-import { stages as stageItems } from "../../data/homeData";
+import { stages as stageItems } from "../../Data/HomeData";
 
 export default function HomeStages() {
   return (

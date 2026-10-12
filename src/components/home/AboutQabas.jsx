@@ -2,9 +2,9 @@ import React from "react";
 import FeatureCard from "./FeatureCard";
 import image4 from "../../assets/image4.png";
 import image5 from "../../assets/image5.png";
-import { features as featureItems } from "../../data/homeData";
+import { features as featureItems } from "../../Data/HomeData";
 
-export default function AboutQabas() {
+export default function AboutQabas () {
   return (
 <div className="w-full h-fit flex flex-col lg:flex-row lg:justify-between gap-16 lg:gap-8 text-[#F8F6F0] px-6 py-12 sm:px-10 sm:py-16 lg:p-20">
         <div className="right w-full lg:w-[734px] lg:max-w-[55%] xl:max-w-none">

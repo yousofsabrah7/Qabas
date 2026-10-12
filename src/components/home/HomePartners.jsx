@@ -1,7 +1,7 @@
 import React from "react";
 import GoldButton from "./GoldButton";
 import SectionHeading from "./SectionHeading";
-import { partners as partnerImages } from "../../data/homeData";
+import { partners as partnerImages } from "../../Data/HomeData";
 
 export default function HomePartners() {
   return (

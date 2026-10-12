@@ -2,7 +2,7 @@ import React from "react";
 import JourneyStep from "./JourneyStep";
 import JourneyCurve from "./JourneyCurve";
 import image6 from "../../assets/image6.png";
-import { journey as journeyItems } from "../../data/homeData";
+import { journey as journeyItems } from "../../Data/HomeData";
 
 export default function HomeJourney() {
   return (
