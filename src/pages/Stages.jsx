@@ -4,6 +4,7 @@ import stagesBg from "../assets/image 36.png";
 import Circle from "../components/Circle";
 import StageSection from "../components/StageSection";
 import { stagesData } from "../Data/StagesData";
+import HomeFooter from "../components/home/HomeFooter";
 
 function Stages() {
   return (
@@ -115,6 +116,7 @@ function Stages() {
           stage={stage}
         />
       ))}
+      <HomeFooter />
     </div>
   );
 }

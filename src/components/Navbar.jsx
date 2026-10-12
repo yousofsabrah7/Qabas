@@ -15,7 +15,17 @@ function Navbar() {
     return (
         <nav
             dir="rtl"
-            className=" relative flex items-center justify-between px-8 "
+            className=" 
+                sticky 
+                top-0 
+                z-50 
+                flex 
+                items-center 
+                justify-between
+                px-8
+                bg-white/70    
+                backdrop-blur-md
+                border-b border-white/20 "
         >
 
             {/* Logo */}
@@ -29,9 +39,9 @@ function Navbar() {
 
             {/* Links */}
             <div className="leftSide flex items-center">
-                <button className="md:hidden " 
-                onClick={() => { setIsOpen(!isOpen) }}
-                aria-label={isOpen ? "إغلاق القائمة" : "فتح القائمة"}
+                <button className="md:hidden "
+                    onClick={() => { setIsOpen(!isOpen) }}
+                    aria-label={isOpen ? "إغلاق القائمة" : "فتح القائمة"}
                 >
                     {isOpen ? <X size={28} /> : <Menu size={28} />}
                 </button>
