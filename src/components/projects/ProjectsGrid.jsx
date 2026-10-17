@@ -2,7 +2,7 @@
 import { useMemo, useState, useEffect } from "react";
 
 import ProjectCard from "./ProjectCard";
-import { projects } from "../../data/projectsData";
+import { projects } from "../../Data/ProjectsData";
 
 const PAGE_SIZE = 6;
 const LOAD_MORE_COUNT = 3;
