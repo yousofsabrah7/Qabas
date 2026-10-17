@@ -7,6 +7,7 @@ import Contact from './pages/Contact'
 import Stages from './pages/Stages'
 import Home from './pages/Home'
 import JoinUs from './pages/JoinUs'
+import HomeFooter from './components/home/HomeFooter'
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
       <Route path='stages' element={<Stages/>}/>
       <Route path='joinUs' element={<JoinUs/>}/>
     </Routes>
+    <HomeFooter/>
     </>
 
   )
