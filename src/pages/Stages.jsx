@@ -116,7 +116,6 @@ function Stages() {
           stage={stage}
         />
       ))}
-      <HomeFooter />
     </div>
   );
 }

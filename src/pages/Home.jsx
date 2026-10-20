@@ -5,7 +5,6 @@ import HomeStages from "../components/home/HomeStages";
 import HomeJourney from "../components/home/HomeJourney";
 import HomeProjects from "../components/home/HomeProjects";
 import HomePartners from "../components/home/HomePartners";
-import HomeFooter from "../components/home/HomeFooter"
 
 export default function Home() {
     return (
@@ -16,7 +15,6 @@ export default function Home() {
             <HomeJourney />
             <HomeProjects />
             <HomePartners />
-            <HomeFooter />
         </div>
     );
 }
