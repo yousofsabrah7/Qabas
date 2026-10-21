@@ -105,7 +105,6 @@ export default function Login({ onLogin }) {
     >
       {/* LEFT SIDE - IMAGE */}
 
-
 <aside
   className="
     relative
@@ -118,37 +117,17 @@ export default function Login({ onLogin }) {
     lg:block
   "
 >
-  {/* Background fills empty space */}
-  <div
-    className="
-      absolute
-      inset-0
-      bg-cover
-      bg-center
-      opacity-40
-      blur-xl
-      scale-110
-    "
-    style={{
-      backgroundImage: `url("${loginFrame}")`,
-    }}
-  />
-
-  {/* Full image without cropping */}
   <img
     src={loginFrame}
     alt="قبس - الطريق نحو الفرص"
     className="
-      relative
-      z-10
+      block
       h-full
       w-full
-      object-contain
-      object-center
+      object-fill
     "
   />
 </aside>
-
 
 
       {/* RIGHT SIDE - FORM */}
