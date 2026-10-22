@@ -1,9 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap");
+
 @import "tailwindcss";
-@theme{
-    --color-yellow-normal:#B8943F;
-    --color-yellow-light:#F8F4EC;
-    --color-cream-normal: #F7F1E5;
-    --color-cream2-normal: #F8F6F0;
-    --color-gray-normal:##4F5666;
-    --color-blue-normal:##14223B
+@theme {
+  --color-yellow-normal: #b8943f;
+  --color-yellow-light: #f8f4ec;
+  --color-cream-normal: #f7f1e5;
+  --color-cream2-normal: #f8f6f0;
+  --color-gray-normal: ##4f5666;
+  --color-blue-normal: ##14223b;
+  --font-sans: "Amiri", serif;
+  --font-amiri: "Amiri", serif;
+}
+html,
+body,
+#root {
+  font-family: "Amiri", serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+@keyframes pageFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.page-transition {
+  animation: pageFade 0.3s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none;
+  }
 }

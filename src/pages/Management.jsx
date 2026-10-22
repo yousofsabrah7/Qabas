@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowUpLeft,
   Flame,
@@ -62,9 +63,10 @@ function Field({
           h-[44px] w-full rounded-[8px] border px-3
           text-[13px] text-[#586276] outline-none
           transition-colors sm:text-[14px]
-          ${editing
-            ? "border-[#B8943F] bg-white focus:ring-2 focus:ring-[#B8943F]/20"
-            : "border-[#E2E5EA] bg-[#FDFDFD]"
+          ${
+            editing
+              ? "border-[#B8943F] bg-white focus:ring-2 focus:ring-[#B8943F]/20"
+              : "border-[#E2E5EA] bg-[#FDFDFD]"
           }
         `}
       />
@@ -90,19 +92,20 @@ export default function Management({
   onSaveProfile,
   onSaveProject,
 }) {
-  const [hasProject, setHasProject] = useState(initialHasProject);
+  const navigate = useNavigate();
 
+  const [hasProject, setHasProject] = useState(initialHasProject);
   const [profile, setProfile] = useState(initialProfile);
 
   const [project, setProject] = useState(
     initialHasProject
       ? initialProject
       : {
-        name: "",
-        category: "",
-        stage: "",
-        description: "",
-      }
+          name: "",
+          category: "",
+          stage: "",
+          description: "",
+        }
   );
 
   const [editingProfile, setEditingProfile] = useState(false);
@@ -110,7 +113,6 @@ export default function Management({
   const [message, setMessage] = useState("");
   const [creating, setCreating] = useState(false);
 
-  // الاسم الأول مأخوذ من حقل الاسم في المعلومات الشخصية
   const firstName = profile.name.trim().split(/\s+/)[0] || "بك";
 
   const changeProfile = (key, value) => {
@@ -194,7 +196,6 @@ export default function Management({
       className="min-h-screen bg-[#FAF9F6] text-[#14223B]"
     >
       <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 pb-16 pt-10 sm:px-8 lg:gap-8 lg:px-12 lg:pt-14">
-
         {/* HEADER */}
         <header className="text-right">
           <p className="mb-2 inline-flex items-center gap-2 text-[18px] font-semibold text-[#B8943F] sm:text-[21px]">
@@ -202,7 +203,6 @@ export default function Management({
             <Flame size={22} fill="currentColor" />
           </p>
 
-          {/* الاسم مربوط بالمعلومات الشخصية */}
           <h1 className="text-[29px] font-bold leading-tight sm:text-[38px] lg:text-[44px]">
             مرحبًا يا {firstName}
             <span aria-hidden="true"> 👋</span>
@@ -238,14 +238,10 @@ export default function Management({
                   <ArrowUpLeft size={16} />
                 </a>
 
+                {/* ربط صفحة تعديل المشروع */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setEditingProject(true);
-                    document
-                      .getElementById("project-info")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }}
+                  onClick={() => navigate("/project/edit")}
                   className="rounded-full bg-[#B8943F] px-6 py-2.5 text-[13px] font-semibold text-white hover:bg-[#A17D2D]"
                 >
                   إدارة المشروع
@@ -318,9 +314,7 @@ export default function Management({
             <Field
               label="الاسم"
               value={profile.name}
-              onChange={(value) =>
-                changeProfile("name", value)
-              }
+              onChange={(value) => changeProfile("name", value)}
               editing={editingProfile}
             />
 
@@ -328,9 +322,7 @@ export default function Management({
               label="البريد الإلكتروني"
               type="email"
               value={profile.email}
-              onChange={(value) =>
-                changeProfile("email", value)
-              }
+              onChange={(value) => changeProfile("email", value)}
               editing={editingProfile}
             />
           </div>
@@ -361,36 +353,24 @@ export default function Management({
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               <Field
                 label="اسم المشروع"
-                value={
-                  hasProject || creating ? project.name : ""
-                }
-                onChange={(value) =>
-                  changeProject("name", value)
-                }
+                value={hasProject || creating ? project.name : ""}
+                onChange={(value) => changeProject("name", value)}
                 editing={editingProject || creating}
                 placeholder="اسم مشروعك"
               />
 
               <Field
                 label="المجال"
-                value={
-                  hasProject || creating ? project.category : ""
-                }
-                onChange={(value) =>
-                  changeProject("category", value)
-                }
+                value={hasProject || creating ? project.category : ""}
+                onChange={(value) => changeProject("category", value)}
                 editing={editingProject || creating}
                 placeholder="مجال المشروع"
               />
 
               <Field
                 label="مرحلة المشروع"
-                value={
-                  hasProject || creating ? project.stage : ""
-                }
-                onChange={(value) =>
-                  changeProject("stage", value)
-                }
+                value={hasProject || creating ? project.stage : ""}
+                onChange={(value) => changeProject("stage", value)}
                 editing={editingProject || creating}
                 placeholder="مرحلة المشروع"
               />
@@ -406,10 +386,7 @@ export default function Management({
                   rows={3}
                   value={project.description}
                   onChange={(e) =>
-                    changeProject(
-                      "description",
-                      e.target.value
-                    )
+                    changeProject("description", e.target.value)
                   }
                   className="w-full resize-y rounded-lg border border-[#B8943F] p-3 text-[14px] outline-none focus:ring-2 focus:ring-[#B8943F]/20"
                 />

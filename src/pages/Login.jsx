@@ -432,26 +432,30 @@ export default function Login({ onLogin }) {
             </button>
           </form>
 
-          {/* REGISTER */}
-          <div className="mt-9 text-center">
-            <p className="text-[14px] text-[#7C818B]">
-              ليس لديك حساب؟
-            </p>
+         
 
-            <Link
-              to="/register"
-              className="
-                mt-2
-                inline-block
-                text-[15px]
-                font-semibold
-                text-[#B8943F]
-                hover:underline
-              "
-            >
-              تقدم بطلب احتضان مشروعك
-            </Link>
-          </div>
+{/* REGISTER */}
+<div className="mt-9 text-center">
+  <p className="text-[14px] text-[#7C818B]">
+    ليس لديك حساب؟
+  </p>
+
+  <Link
+to="/project/create"
+    className="
+      mt-2
+      inline-block
+      text-[15px]
+      font-semibold
+      text-[#B8943F]
+      hover:underline
+    "
+  >
+    إنشاء حساب جديد
+  </Link>
+</div>
+ 
+
         </div>
       </main>
     </div>

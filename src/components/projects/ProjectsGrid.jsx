@@ -7,136 +7,154 @@ import { projects } from "../../Data/ProjectsData";
 const PAGE_SIZE = 6;
 const LOAD_MORE_COUNT = 3;
 
-export default function ProjectsGrid({ search = "" }) {
-    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+// توحيد النصوص العربية
+const normalizeText = (text) => {
+  return String(text ?? "")
+    .toLowerCase()
+    .normalize("NFKC")
+    .replace(/[\u064B-\u065F\u0670]/g, "")
+    .replace(/[أإآٱ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ـ/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+};
 
-    // Filter projects based on search
-    const filteredProjects = useMemo(() => {
-        const query = search.trim().toLowerCase();
+export default function ProjectsGrid({
+  search = "",
+  selectedField = "",
+}) {
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-        if (!query) return projects;
+  // البحث بالاسم + التصفية حسب المجال
+  const filteredProjects = useMemo(() => {
+    const query = normalizeText(search);
+    const field = normalizeText(selectedField);
 
-        return projects.filter((project) =>
-            [
-                project.title,
-                project.category,
-                project.description,
-            ]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase()
-                .includes(query)
-        );
-    }, [search]);
+    return projects.filter((project) => {
+      const projectName = normalizeText(project.title);
+      const projectCategory = normalizeText(project.category);
 
-    // Reset visible projects when search changes
-    useEffect(() => {
-        setVisibleCount(PAGE_SIZE);
-    }, [search]);
+      // البحث باسم المشروع فقط
+      const matchesSearch =
+        !query || projectName.includes(query);
 
-    const visibleProjects = filteredProjects.slice(0, visibleCount);
+      // التصفية حسب مجال المشروع فقط
+      const matchesField =
+        !field ||
+        field === normalizeText("جميع المجالات") ||
+        projectCategory === field;
 
-    const remaining = Math.max(
-        filteredProjects.length - visibleCount,
-        0
+      return matchesSearch && matchesField;
+    });
+  }, [search, selectedField]);
+
+  // إعادة عدد المشاريع الظاهرة عند تغيير البحث أو المجال
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [search, selectedField]);
+
+  const visibleProjects = filteredProjects.slice(
+    0,
+    visibleCount
+  );
+
+  const remaining = Math.max(
+    filteredProjects.length - visibleCount,
+    0
+  );
+
+  const handleLoadMore = () => {
+    setVisibleCount((count) =>
+      Math.min(
+        count + LOAD_MORE_COUNT,
+        filteredProjects.length
+      )
     );
+  };
 
-    const handleLoadMore = () => {
-        setVisibleCount((count) =>
-            Math.min(
-                count + LOAD_MORE_COUNT,
-                filteredProjects.length
-            )
-        );
-    };
-
-    return (
-        <section
-            id="all-projects"
-            dir="rtl"
-            className="
+  return (
+    <section
+      id="all-projects"
+      dir="rtl"
+      className="
         mx-auto
         w-full
         max-w-[1440px]
         px-5
         pb-12
         pt-10
-
         sm:px-8
         sm:pb-14
-
         lg:px-12
         lg:pb-20
         lg:pt-16
       "
-        >
-            {/* SECTION HEADER */}
-            <div
-                className="
+    >
+      {/* SECTION HEADER */}
+      <div
+        className="
           mb-7
           flex
           flex-wrap
           items-center
           justify-between
           gap-3
-
           sm:mb-9
           lg:mb-10
         "
-            >
-                <h2
-                    className="
+      >
+        <h2
+          className="
             text-[28px]
             font-bold
             leading-tight
             text-[#14223B]
-
             sm:text-[36px]
             lg:text-[48px]
           "
-                >
-                    جميع مشاريع قبس
-                </h2>
+        >
+          {search.trim() || selectedField
+            ? "نتائج البحث"
+            : "جميع مشاريع قبس"}
+        </h2>
 
-                <span
-                    className="
+        <span
+          className="
             shrink-0
             text-[13px]
             text-[#9B864E]
-
             sm:text-[15px]
             lg:text-[17px]
           "
-                >
-                    {filteredProjects.length} مشروع
-                </span>
-            </div>
+        >
+          {filteredProjects.length} مشروع
+        </span>
+      </div>
 
-            {/* PROJECTS GRID */}
-            {visibleProjects.length > 0 ? (
-                <div
-                    className="
+      {/* PROJECTS GRID */}
+      {visibleProjects.length > 0 ? (
+        <div
+          className="
             grid
             grid-cols-1
             gap-6
-
             sm:grid-cols-2
             sm:gap-7
-
             lg:grid-cols-3
             lg:gap-10
           "
-                >
-                    {visibleProjects.map((project) => (
-                        <ProjectCard
-                            key={project.id}
-                            project={project}
-                        />
-                    ))}
-                </div>
-            ) : (
-                <p
-                    className="
+        >
+          {visibleProjects.map((project) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+            />
+          ))}
+        </div>
+      ) : (
+        <p
+          className="
             rounded-2xl
             bg-white
             px-5
@@ -146,18 +164,18 @@ export default function ProjectsGrid({ search = "" }) {
             text-[#858A91]
             sm:text-[17px]
           "
-                >
-                    ما لقينا مشاريع مطابقة لبحثك.
-                </p>
-            )}
+        >
+          ما لقينا مشاريع مطابقة لبحثك أو المجال المحدد.
+        </p>
+      )}
 
-            {/* LOAD MORE BUTTON */}
-            {remaining > 0 && (
-                <div className="mt-9 flex justify-center sm:mt-12">
-                    <button
-                        type="button"
-                        onClick={handleLoadMore}
-                        className="
+      {/* LOAD MORE BUTTON */}
+      {remaining > 0 && (
+        <div className="mt-9 flex justify-center sm:mt-12">
+          <button
+            type="button"
+            onClick={handleLoadMore}
+            className="
               rounded-full
               border
               border-[#D8BC7A]
@@ -169,19 +187,17 @@ export default function ProjectsGrid({ search = "" }) {
               text-[#B7964A]
               transition-colors
               duration-300
-
               hover:bg-[#B7964A]
               hover:text-white
-
               sm:px-9
               sm:py-4
               sm:text-[16px]
             "
-                    >
-                        تحميل المزيد ({remaining})
-                    </button>
-                </div>
-            )}
-        </section>
-    );
+          >
+            تحميل المزيد ({remaining})
+          </button>
+        </div>
+      )}
+    </section>
+  );
 }
