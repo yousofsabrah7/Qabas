@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ArrowLeft, Menu, X } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import qabasLogo from "../assets/qabas logo 2.svg";
 
 function Navbar() {
@@ -28,14 +28,16 @@ function Navbar() {
                 border-b border-white/20 "
         >
 
-            {/* Logo */}
-            <div className="rightSide">
-                <img
-                    src={qabasLogo}
-                    alt="Qabas Logo"
-                    className="w-[120px] md:w-[165px] h-[92.813px] shrink-0 object-contain"
-                />
-            </div>
+           {/* Logo */}
+<div className="rightSide">
+    <Link to="/" aria-label="العودة إلى الصفحة الرئيسية">
+        <img
+            src={qabasLogo}
+            alt="Qabas Logo"
+            className="w-[120px] md:w-[165px] h-[92.813px] shrink-0 object-contain cursor-pointer"
+        />
+    </Link>
+</div>
 
             {/* Links */}
             <div className="leftSide flex items-center">

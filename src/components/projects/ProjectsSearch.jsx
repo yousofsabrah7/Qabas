@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
+import { projects } from "../../Data/ProjectsData";
 
 const fields = [
   "جميع المجالات",

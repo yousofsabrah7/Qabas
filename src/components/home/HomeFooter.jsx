@@ -66,12 +66,18 @@ function HomeFooter() {
         className="w-full flex flex-col gap-8 lg:gap-[40px] px-6 py-8 sm:p-10 border-t border-[#4F5666] bg-[#132038]"
       >
         <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 w-full">
-          {/* Logo */}
-          <img
-            className="object-cover w-[83px] h-[82px] bg-[lightgray] bg-center bg-cover bg-no-repeat"
-            src={image35}
-            alt="Qabas Logo"
-          />
+          {/* Logo - يرجع للصفحة الرئيسية */}
+          <NavLink
+            to="/"
+            aria-label="العودة إلى الصفحة الرئيسية"
+            className="inline-block"
+          >
+            <img
+              className="object-cover w-[83px] h-[82px] bg-[lightgray] bg-center bg-cover bg-no-repeat"
+              src={image35}
+              alt="Qabas Logo"
+            />
+          </NavLink>
 
           <div className="flex flex-col lg:flex-row w-full lg:w-auto items-center justify-end gap-8 lg:gap-12">
             {/* Footer Navigation */}
@@ -86,10 +92,11 @@ function HomeFooter() {
           text-[#F8F4EC] font-normal text-base
           border-b-2
           transition-colors duration-300
-          ${isActive
-                        ? "border-yellow-normal"
-                        : "border-transparent hover:border-yellow-normal"
-                      }`
+          ${
+            isActive
+              ? "border-yellow-normal"
+              : "border-transparent hover:border-yellow-normal"
+          }`
                     }
                   >
                     {link.name}

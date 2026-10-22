@@ -1,19 +1,22 @@
-
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 import Navbar from "../components/Navbar";
-import HomeFooter from "../components/home/HomeFooter";
+import Footer from "../components/home/HomeFooter";
 
 export default function MainLayout() {
-    return (
-        <div className="flex min-h-screen flex-col">
-            <Navbar />
+  const location = useLocation();
 
-            <main className="flex-1">
-                <Outlet />
-            </main>
+  return (
+    <div dir="rtl" className="flex min-h-screen flex-col">
+      <Navbar />
 
-            <HomeFooter />
+      <main className="flex-1">
+        <div key={location.pathname} className="page-transition">
+          <Outlet />
         </div>
-    );
+      </main>
+
+      <Footer />
+    </div>
+  );
 }
