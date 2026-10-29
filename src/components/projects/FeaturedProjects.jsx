@@ -2,38 +2,14 @@
 import { useState } from "react";
 import { ArrowUpLeft, Sparkles } from "lucide-react";
 
-import featureDetail from "../../assets/projects/feature-detail.svg";
 import featureVector from "../../assets/projects/Vector 5.svg";
 
-const featuredProjects = [
-    {
-        id: 1,
-        title: "مذاق",
-        description:
-            "علامة تجارية تقدم منتجات غذائية عالية الجودة وذات جودة عالية.",
-        image: featureDetail,
-    },
-    {
-        id: 2,
-        title: "مشروع مميز",
-        description:
-            "مشروع ريادي يجمع بين الإبداع والجودة، ويحوّل الأفكار إلى منتجات مميزة.",
-        image:
-            "https://images.unsplash.com/photo-1542838132-92c53300491e?w=1400&q=85",
-    },
-    {
-        id: 3,
-        title: "صناعة وإبداع",
-        description:
-            "فكرة مبتكرة انطلقت بشغف، وتطورت لتقدم تجربة مختلفة ومميزة.",
-        image:
-            "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1400&q=85",
-    },
-];
-
-export default function FeaturedProjects() {
+export default function FeaturedProjects({ projects = [] }) {
     const [activeIndex, setActiveIndex] = useState(0);
+    const featuredProjects = projects.slice(0, 3);
     const activeProject = featuredProjects[activeIndex];
+
+    if (!activeProject) return null;
 
     return (
         <section

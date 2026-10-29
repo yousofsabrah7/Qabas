@@ -5,24 +5,14 @@ import {
   ArrowUpLeft,
   Flame,
   Pencil,
-  Plus,
   Save,
   X,
 } from "lucide-react";
-
-import sukoonImage from "../assets/management/sukoon-product.png";
+import useManagedProjects from "../hooks/useManagedProjects";
 
 const initialProfile = {
   name: "سارة محمد",
   email: "sara@example.com",
-};
-
-const initialProject = {
-  name: "سكون",
-  category: "منتجات يدوية",
-  stage: "مرحلة النمو",
-  description:
-    "مشروع يهتم بصناعة الشموع العطرية والمنتجات اليدوية التي تضيف لمسة من الدفء والجمال لكل مكان.",
 };
 
 function SectionCard({ title, children, action }) {
@@ -87,43 +77,64 @@ function EditAction({ editing, onClick }) {
   );
 }
 
+function ManagedProjectCard({ project, onEdit }) {
+  return (
+    <article className="overflow-hidden rounded-[18px] border border-[#E6E5E1] bg-white shadow-[0_3px_8px_rgba(20,34,59,.04)]">
+      <img
+        src={project.image}
+        alt={project.title}
+        className="h-48 w-full object-cover"
+      />
+
+      <div className="space-y-4 p-5 text-right">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="text-xl font-bold text-[#14223B]">
+            {project.title}
+          </h3>
+          <span className="shrink-0 rounded-full bg-[#F7F0DE] px-3 py-1 text-xs text-[#B8943F]">
+            {project.category}
+          </span>
+        </div>
+        <p className="min-h-16 text-sm leading-7 text-[#6E7583]">
+          {project.description}
+        </p>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#EEECE7] pt-4">
+          <button
+            type="button"
+            onClick={() => onEdit(project)}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#14223B] hover:text-[#B8943F]"
+          >
+            تفاصيل المشروع
+            <ArrowUpLeft size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={() => onEdit(project)}
+            className="inline-flex items-center gap-2 rounded-full bg-[#B8943F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#A17D2D]"
+          >
+            <Pencil size={15} />
+            تعديل كل البيانات
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export default function Management({
-  initialHasProject = true,
   onSaveProfile,
-  onSaveProject,
 }) {
   const navigate = useNavigate();
-
-  const [hasProject, setHasProject] = useState(initialHasProject);
+  const { projects, error: projectsError } = useManagedProjects();
   const [profile, setProfile] = useState(initialProfile);
-
-  const [project, setProject] = useState(
-    initialHasProject
-      ? initialProject
-      : {
-          name: "",
-          category: "",
-          stage: "",
-          description: "",
-        }
-  );
-
   const [editingProfile, setEditingProfile] = useState(false);
-  const [editingProject, setEditingProject] = useState(false);
   const [message, setMessage] = useState("");
-  const [creating, setCreating] = useState(false);
 
   const firstName = profile.name.trim().split(/\s+/)[0] || "بك";
 
   const changeProfile = (key, value) => {
     setProfile((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
-
-  const changeProject = (key, value) => {
-    setProject((prev) => ({
       ...prev,
       [key]: value,
     }));
@@ -152,42 +163,8 @@ export default function Management({
     }
   };
 
-  const saveProject = async () => {
-    if (!editingProject) {
-      setEditingProject(true);
-      return;
-    }
-
-    if (!project.name.trim() || !project.category.trim()) {
-      setMessage("اسم المشروع والمجال مطلوبان.");
-      return;
-    }
-
-    try {
-      await onSaveProject?.(project);
-      setEditingProject(false);
-      setMessage("تم تحديث بيانات المشروع في الصفحة.");
-    } catch {
-      setMessage("تعذر حفظ بيانات المشروع.");
-    }
-  };
-
-  const createProject = () => {
-    if (!creating) {
-      setCreating(true);
-      return;
-    }
-
-    if (!project.name.trim() || !project.category.trim()) {
-      setMessage("أدخل اسم المشروع ومجاله أولًا.");
-      return;
-    }
-
-    setHasProject(true);
-    setCreating(false);
-    setMessage(
-      "تم إنشاء المشروع محليًا. اربط العملية بالـBackend لحفظه فعليًا."
-    );
+  const editProject = (project) => {
+    navigate("/project/edit", { state: { project } });
   };
 
   return (
@@ -212,75 +189,6 @@ export default function Management({
             من هنا يمكنك متابعة مشاريعك وتحديث بياناتك وإدارة رحلتك مع قبس.
           </p>
         </header>
-
-        {/* PROJECT CARD */}
-        {hasProject ? (
-          <section className="flex flex-col gap-5 rounded-[18px] border border-[#E6E5E1] bg-white p-4 shadow-[0_3px_8px_rgba(20,34,59,.04)] md:flex-row md:items-center md:p-5">
-            <div className="min-w-0 flex-1 text-right">
-              <h2 className="mb-3 text-[25px] font-bold sm:text-[30px]">
-                {project.name}
-              </h2>
-
-              <p className="max-w-[760px] text-[14px] leading-7 text-[#6E7583] sm:text-[16px]">
-                {project.description}
-              </p>
-
-              <span className="mt-4 inline-block rounded-full bg-[#F7F0DE] px-4 py-1.5 text-[12px] font-medium text-[#B8943F]">
-                {project.stage}
-              </span>
-
-              <div className="mt-5 flex flex-wrap gap-3">
-                <a
-                  href="#project-info"
-                  className="inline-flex items-center gap-2 rounded-full border border-[#14223B] px-5 py-2.5 text-[13px] font-semibold transition hover:bg-[#14223B] hover:text-white"
-                >
-                  عرض المشروع
-                  <ArrowUpLeft size={16} />
-                </a>
-
-                {/* ربط صفحة تعديل المشروع */}
-                <button
-                  type="button"
-                  onClick={() => navigate("/project/edit")}
-                  className="rounded-full bg-[#B8943F] px-6 py-2.5 text-[13px] font-semibold text-white hover:bg-[#A17D2D]"
-                >
-                  إدارة المشروع
-                </button>
-              </div>
-            </div>
-
-            <img
-              src={sukoonImage}
-              alt="منتجات مشروع سكون من الشموع العطرية"
-              className="h-[220px] w-full rounded-[12px] object-cover md:h-[200px] md:w-[34%] lg:h-[230px] lg:w-[32%]"
-            />
-          </section>
-        ) : (
-          <section className="rounded-[18px] border border-[#E6E5E1] bg-white px-5 py-7 text-right shadow-[0_3px_8px_rgba(20,34,59,.04)] sm:px-8">
-            <h2 className="text-[21px] font-bold sm:text-[25px]">
-              مشروعك الجاي يبدأ من هون.
-            </h2>
-
-            <p className="mt-3 text-[14px] leading-7 text-[#737B89] sm:text-[16px]">
-              لسه ما أضفت أي مشروع. ابدأ رحلتك مع قبس وشارك فكرتك،
-              وخليها تكبر وتتحول لمشروع يترك أثر.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => {
-                setCreating(true);
-                document
-                  .getElementById("project-info")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#B8943F] px-6 py-2.5 text-[14px] font-semibold text-white hover:bg-[#A17D2D]"
-            >
-              <Plus size={17} />
-              أنشئ مشروعك
-            </button>
-          </section>
-        )}
 
         {/* STATUS MESSAGE */}
         {message && (
@@ -328,72 +236,38 @@ export default function Management({
           </div>
         </SectionCard>
 
-        {/* PROJECT INFORMATION */}
-        <div id="project-info" className="scroll-mt-24">
-          <SectionCard
-            title="معلومات المشروع"
-            action={
-              hasProject ? (
-                <EditAction
-                  editing={editingProject}
-                  onClick={saveProject}
+        <SectionCard
+          title="إدارة المشاريع"
+          action={
+            <span className="text-sm text-[#818795]">
+              {projects.length} مشروعًا
+            </span>
+          }
+        >
+          <p className="mb-5 text-sm leading-7 text-[#737B89]">
+            عدّل كل مشروع على حدة واحفظ التغيير ليظهر في صفحة مشاريع قبس. تُحفظ البيانات في هذا المتصفح.
+          </p>
+
+          {projectsError ? (
+            <p role="alert" className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+              {projectsError}
+            </p>
+          ) : projects.length === 0 ? (
+            <p role="status" className="text-sm text-[#737B89]">
+              جارٍ تحميل المشاريع...
+            </p>
+          ) : (
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {projects.map((project) => (
+                <ManagedProjectCard
+                  key={project.id}
+                  project={project}
+                  onEdit={editProject}
                 />
-              ) : creating ? (
-                <button
-                  type="button"
-                  onClick={createProject}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#B8943F] px-5 py-2 text-[13px] font-semibold text-white"
-                >
-                  <Plus size={15} />
-                  إنشاء المشروع
-                </button>
-              ) : null
-            }
-          >
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              <Field
-                label="اسم المشروع"
-                value={hasProject || creating ? project.name : ""}
-                onChange={(value) => changeProject("name", value)}
-                editing={editingProject || creating}
-                placeholder="اسم مشروعك"
-              />
-
-              <Field
-                label="المجال"
-                value={hasProject || creating ? project.category : ""}
-                onChange={(value) => changeProject("category", value)}
-                editing={editingProject || creating}
-                placeholder="مجال المشروع"
-              />
-
-              <Field
-                label="مرحلة المشروع"
-                value={hasProject || creating ? project.stage : ""}
-                onChange={(value) => changeProject("stage", value)}
-                editing={editingProject || creating}
-                placeholder="مرحلة المشروع"
-              />
+              ))}
             </div>
-
-            {(editingProject || creating) && (
-              <label className="mt-5 block text-right">
-                <span className="mb-2 block text-[14px] font-semibold">
-                  وصف المشروع
-                </span>
-
-                <textarea
-                  rows={3}
-                  value={project.description}
-                  onChange={(e) =>
-                    changeProject("description", e.target.value)
-                  }
-                  className="w-full resize-y rounded-lg border border-[#B8943F] p-3 text-[14px] outline-none focus:ring-2 focus:ring-[#B8943F]/20"
-                />
-              </label>
-            )}
-          </SectionCard>
-        </div>
+          )}
+        </SectionCard>
       </main>
     </div>
   );

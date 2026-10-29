@@ -64,17 +64,17 @@ const socials = [
   {
     icon: FaFacebookF,
     label: "Facebook",
-    href: "https://facebook.com",
+    href: "https://www.facebook.com/Qabas.inc",
   },
   {
     icon: FaInstagram,
     label: "Instagram",
-    href: "https://instagram.com",
+    href: "https://www.instagram.com/qabas_ptuk?igsh=MTlwZWMxMmpxNzkwcw%3D%3D",
   },
   {
     icon: FaLinkedinIn,
     label: "LinkedIn",
-    href: "https://linkedin.com",
+    href: "https://www.linkedin.com/company/qabas-ptuk/posts/?feedView=all",
   },
 ];
 

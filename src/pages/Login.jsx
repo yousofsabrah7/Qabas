@@ -1,13 +1,18 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 
 import loginFrame from "../assets/login-frame.svg";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isDemoCredentials = (values) =>
+  import.meta.env.DEV &&
+  values.email.trim() === "123" &&
+  values.password === "123";
 
 export default function Login({ onLogin }) {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -20,16 +25,20 @@ export default function Login({ onLogin }) {
 
   const validate = (values) => {
     const nextErrors = {};
+    const isDemoLogin = isDemoCredentials(values);
 
     if (!values.email.trim()) {
       nextErrors.email = "البريد الإلكتروني مطلوب";
-    } else if (!EMAIL_REGEX.test(values.email.trim())) {
+    } else if (
+      !isDemoLogin &&
+      !EMAIL_REGEX.test(values.email.trim())
+    ) {
       nextErrors.email = "يرجى إدخال بريد إلكتروني صحيح";
     }
 
     if (!values.password) {
       nextErrors.password = "كلمة المرور مطلوبة";
-    } else if (values.password.length < 8) {
+    } else if (!isDemoLogin && values.password.length < 8) {
       nextErrors.password =
         "كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل";
     }
@@ -60,6 +69,12 @@ export default function Login({ onLogin }) {
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+
+    if (typeof onLogin !== "function" && isDemoCredentials(form)) {
+      sessionStorage.setItem("qabas-demo-session", "true");
+      navigate("/management");
       return;
     }
 
@@ -211,7 +226,8 @@ export default function Login({ onLogin }) {
               <input
                 id="login-email"
                 name="email"
-                type="email"
+                type="text"
+                inputMode="email"
                 dir="rtl"
                 autoComplete="email"
                 value={form.email}
@@ -431,6 +447,12 @@ export default function Login({ onLogin }) {
               )}
             </button>
           </form>
+
+          {import.meta.env.DEV && (
+            <p className="mt-4 text-center text-xs text-[#7C818B]">
+              بيانات تجريبية محلية: البريد 123 وكلمة المرور 123
+            </p>
+          )}
 
          
 

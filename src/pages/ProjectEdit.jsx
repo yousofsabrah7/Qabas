@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FiArrowRight, FiPlusCircle, FiTrash2, FiUpload, FiX } from "react-icons/fi";
 import ProjectPreviewModal from "../components/ProjectPreviewModal";
 import sukoonProduct from "../assets/project-edit/sukoon-product.png";
 import sukoonDetail from "../assets/project-edit/sukoon-detail.png";
+import {
+  readManagedProjects,
+  saveManagedProjects,
+} from "../services/projects";
 
 const STORAGE_KEY = "qabas-project-edit";
 const defaultProject = {
@@ -27,6 +31,44 @@ const categories = ["منتجات يدوية", "التكنولوجيا", "الت
 const inputStyle = "h-11 w-full rounded-lg border border-[#D9DDE2] bg-white px-3 text-[13px] text-[#14223B] outline-none placeholder:text-[#A1A8B3] focus:border-[#B8943F] focus:ring-2 focus:ring-[#B8943F]/15";
 const textareaStyle = `${inputStyle} h-auto min-h-[84px] resize-y py-3 leading-7`;
 const blankMember = () => ({ name: "", role: "" });
+
+async function persistImage(image) {
+  if (typeof image === "string") return image;
+
+  const bitmap = await createImageBitmap(image);
+  const scale = Math.min(1, 1000 / bitmap.width, 700 / bitmap.height);
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    bitmap.close();
+    throw new Error("تعذر تجهيز الصورة في هذا المتصفح.");
+  }
+
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+
+  const blob = await new Promise((resolve) =>
+    canvas.toBlob(resolve, "image/jpeg", 0.72)
+  );
+
+  if (!blob || blob.size > 180 * 1024) {
+    throw new Error(
+      "الصورة كبيرة على التخزين المحلي. اختر صورة أصغر."
+    );
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("تعذر قراءة الصورة."));
+    reader.readAsDataURL(blob);
+  });
+}
 
 function Section({ title, description, children }) {
   return (
@@ -83,18 +125,69 @@ function UploadTile({ onFiles, multiple = false, title = "تحميل صورة", 
 
 export default function ProjectEdit({ projectData, onSaveProject }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const selectedProject = projectData || location.state?.project;
   const [form, setForm] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-      return { ...defaultProject, ...(saved?.form || {}), ...(projectData?.form || projectData || {}) };
-    } catch { return { ...defaultProject, ...(projectData?.form || projectData || {}) }; }
+      return {
+        ...defaultProject,
+        ...(saved?.form || {}),
+        ...(selectedProject
+          ? {
+              name: selectedProject.title,
+              englishName: selectedProject.englishName || "",
+              field: selectedProject.category,
+              stage: selectedProject.stage || "",
+              idea: selectedProject.idea || selectedProject.about || "",
+              description: selectedProject.description,
+              website: selectedProject.website || "",
+              instagram: selectedProject.instagram || "",
+              facebook: selectedProject.facebook || "",
+              whatsapp: selectedProject.whatsapp || "",
+            }
+          : {}),
+        ...(projectData?.form || {}),
+      };
+    } catch {
+      return {
+        ...defaultProject,
+        ...(selectedProject
+          ? {
+              name: selectedProject.title,
+              englishName: selectedProject.englishName || "",
+              field: selectedProject.category,
+              stage: selectedProject.stage || "",
+              idea: selectedProject.idea || selectedProject.about || "",
+              description: selectedProject.description,
+              website: selectedProject.website || "",
+              instagram: selectedProject.instagram || "",
+              facebook: selectedProject.facebook || "",
+              whatsapp: selectedProject.whatsapp || "",
+            }
+          : {}),
+      };
+    }
   });
   const [team, setTeam] = useState(() => {
-    try { return projectData?.team || JSON.parse(localStorage.getItem(STORAGE_KEY) || "null")?.team || defaultTeam; }
+    try {
+      if (selectedProject) return selectedProject.team || [];
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null")?.team || defaultTeam;
+    }
     catch { return defaultTeam; }
   });
-  const [logo, setLogo] = useState(projectData?.logo || sukoonProduct);
-  const [images, setImages] = useState(projectData?.images || defaultImages);
+  const [logo, setLogo] = useState(
+    selectedProject ? selectedProject.logo || null : sukoonProduct
+  );
+  const [images, setImages] = useState(
+    selectedProject
+      ? selectedProject.images?.length
+        ? selectedProject.images
+        : selectedProject.image
+          ? [selectedProject.image]
+          : []
+      : defaultImages
+  );
   const [errors, setErrors] = useState({});
   const [previewOpen, setPreviewOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -130,15 +223,48 @@ export default function ProjectEdit({ projectData, onSaveProject }) {
     if (!validate()) { setMessage("يرجى تعبئة الحقول المطلوبة."); return; }
     setSaving(true);
     try {
-      const payload = { ...form, team: team.filter(m => m.name.trim() || m.role.trim()), logo, images };
+      const savedImages = await Promise.all(images.map(persistImage));
+      const savedLogo = logo ? await persistImage(logo) : null;
+      const payload = {
+        ...form,
+        id: selectedProject?.id,
+        title: form.name.trim(),
+        category: form.field.trim(),
+        about: form.idea,
+        description: form.description,
+        image: savedImages[0] || savedLogo || "",
+        images: savedImages,
+        logo: savedLogo,
+        team: team.filter(m => m.name.trim() || m.role.trim()),
+      };
+
       if (onSaveProject) {
         await onSaveProject(payload);
         setMessage("تم حفظ التعديلات بنجاح.");
+      } else if (selectedProject?.id) {
+        const currentProjects = readManagedProjects();
+        saveManagedProjects(
+          currentProjects.map((project) =>
+            project.id === selectedProject.id
+              ? { ...project, ...payload }
+              : project
+          )
+        );
+        navigate("/management");
       } else {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ form, team }));
-        setMessage("تم حفظ البيانات النصية محليًا على هذا المتصفح. الصور تحتاج Backend للاحتفاظ بها بعد تحديث الصفحة.");
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ form: payload, team, logo: savedLogo, images: savedImages })
+        );
+        setMessage("تم حفظ البيانات محليًا على هذا المتصفح.");
       }
-    } catch (err) { setMessage(err?.message || "تعذر حفظ التعديلات."); }
+    } catch (err) {
+      setMessage(
+        err?.name === "QuotaExceededError"
+          ? "مساحة التخزين المحلية ممتلئة. قلّل عدد الصور أو حجمها ثم أعد المحاولة."
+          : err?.message || "تعذر حفظ التعديلات."
+      );
+    }
     finally { setSaving(false); }
   };
 

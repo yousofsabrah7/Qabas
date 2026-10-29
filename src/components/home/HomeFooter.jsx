@@ -112,7 +112,7 @@ function HomeFooter() {
             {/* Social Media Icons */}
             <div className="contact flex items-center gap-[19px]">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/Qabas.inc"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
@@ -124,7 +124,7 @@ function HomeFooter() {
               </a>
 
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/qabas-ptuk/posts/?feedView=all"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
@@ -146,7 +146,7 @@ function HomeFooter() {
               </a>
 
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/qabas_ptuk?igsh=MTlwZWMxMmpxNzkwcw%3D%3D"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"

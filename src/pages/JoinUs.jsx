@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import loginFrame from "../assets/login-frame.svg";
+import journeyHero from "../assets/journey-hero.png";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -93,18 +93,17 @@ function JoinHero() {
       dir="rtl"
       className="relative flex h-[242px] w-full items-center overflow-hidden bg-[#14223B] sm:h-[300px] lg:h-[350px]"
     >
-      {/* صورة الخلفية */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="pointer-events-none absolute inset-y-0 left-0 w-[78%] bg-cover bg-no-repeat sm:w-[72%] lg:w-[68%]"
         style={{
-          backgroundImage: `url(${loginFrame})`,
+          backgroundImage: `url(${journeyHero})`,
+          backgroundPosition: "center 55%",
         }}
         aria-hidden="true"
       />
 
-      {/* التدرج الكحلي من جهة النص */}
       <div
-        className="absolute inset-0 bg-gradient-to-l from-[#14223B] from-[18%] via-[#14223B]/90 via-[40%] to-transparent"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-l from-[#14223B] from-[35%] via-[#14223B]/65 via-[62%] to-transparent"
         aria-hidden="true"
       />
 

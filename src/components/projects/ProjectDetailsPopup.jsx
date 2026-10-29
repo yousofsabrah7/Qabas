@@ -9,7 +9,11 @@ import {
   Users,
   UserRound,
   ArrowUpLeft,
+  Globe,
+  MessageCircle,
 } from "lucide-react";
+import { FaFacebookF } from "react-icons/fa";
+import { FiInstagram } from "react-icons/fi";
 
 export default function ProjectDetailsPopup({
   project,
@@ -28,6 +32,47 @@ export default function ProjectDetailsPopup({
   const team = Array.isArray(project?.team)
     ? project.team
     : [];
+  const toExternalUrl = (value) => {
+    if (!value) return "";
+    const candidate = /^https?:\/\//i.test(value)
+      ? value
+      : `https://${value}`;
+
+    try {
+      const url = new URL(candidate);
+      return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+    } catch {
+      return "";
+    }
+  };
+  const contacts = [
+    {
+      label: "الموقع",
+      value: project?.website,
+      icon: Globe,
+      href: toExternalUrl(project?.website),
+    },
+    {
+      label: "إنستغرام",
+      value: project?.instagram,
+      icon: FiInstagram,
+      href: toExternalUrl(project?.instagram),
+    },
+    {
+      label: "فيسبوك",
+      value: project?.facebook,
+      icon: FaFacebookF,
+      href: toExternalUrl(project?.facebook),
+    },
+    {
+      label: "واتساب",
+      value: project?.whatsapp,
+      icon: MessageCircle,
+      href: project?.whatsapp.replace(/\D/g, "")
+        ? `https://wa.me/${project.whatsapp.replace(/\D/g, "")}`
+        : "",
+    },
+  ].filter((contact) => contact.value && contact.href);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -135,9 +180,9 @@ export default function ProjectDetailsPopup({
                 {project.title}
               </h2>
 
-              {project.subtitle && (
+              {(project.subtitle || project.englishName) && (
                 <p className="mt-2 text-sm font-semibold text-[#B8943F]">
-                  {project.subtitle}
+                  {project.subtitle || project.englishName}
                 </p>
               )}
 
@@ -194,7 +239,28 @@ export default function ProjectDetailsPopup({
                 )}
               </section>
 
-              {/* روابط التواصل مخفية مؤقتًا */}
+              {contacts.length > 0 && (
+                <section className="mt-6">
+                  <h3 className="mb-3 text-lg font-bold text-[#14223B]">
+                    تواصل مع المشروع
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {contacts.map(({ label, value, icon: Icon, href }) => (
+                      <a
+                        key={label}
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={label}
+                        title={value}
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F2E9D3] text-[#927434] transition hover:bg-[#B8943F] hover:text-white"
+                      >
+                        <Icon size={18} />
+                      </a>
+                    ))}
+                  </div>
+                </section>
+              )}
             </div>
 
             {/* القسم الأيسر */}
