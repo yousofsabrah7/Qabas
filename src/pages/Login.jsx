@@ -7,7 +7,6 @@ import loginFrame from "../assets/login-frame.svg";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const isDemoCredentials = (values) =>
-  import.meta.env.DEV &&
   values.email.trim() === "123" &&
   values.password === "123";
 
@@ -28,12 +27,13 @@ export default function Login({ onLogin }) {
     const isDemoLogin = isDemoCredentials(values);
 
     if (!values.email.trim()) {
-      nextErrors.email = "البريد الإلكتروني مطلوب";
+      nextErrors.email = "الاسم مطلوب";
     } else if (
       !isDemoLogin &&
       !EMAIL_REGEX.test(values.email.trim())
     ) {
-      nextErrors.email = "يرجى إدخال بريد إلكتروني صحيح";
+      nextErrors.email =
+        "أدخل الاسم 123 للدخول التجريبي، أو بريدًا إلكترونيًا صحيحًا";
     }
 
     if (!values.password) {
@@ -72,8 +72,8 @@ export default function Login({ onLogin }) {
       return;
     }
 
-    if (typeof onLogin !== "function" && isDemoCredentials(form)) {
-      sessionStorage.setItem("qabas-demo-session", "true");
+    if (isDemoCredentials(form)) {
+      localStorage.setItem("qabas-demo-session", "true");
       navigate("/management");
       return;
     }
@@ -112,7 +112,9 @@ export default function Login({ onLogin }) {
         w-full
         flex-col
         bg-[#F8F6F0]
-        px-20
+        px-4
+        sm:px-8
+        lg:px-20
         lg:h-dvh
         lg:flex-row
         lg:overflow-hidden
@@ -121,26 +123,12 @@ export default function Login({ onLogin }) {
       {/* LEFT SIDE - IMAGE */}
 
 <aside
-  className="
-    relative
-    hidden
-    h-dvh
-    w-[551px]
-    shrink-0
-    overflow-hidden
-    bg-[#061D36]
-    lg:block
-  "
+  className="relative block h-[220px] w-full shrink-0 overflow-hidden bg-[#061D36] sm:h-[280px] lg:h-dvh lg:w-[551px]"
 >
   <img
     src={loginFrame}
     alt="قبس - الطريق نحو الفرص"
-    className="
-      block
-      h-full
-      w-full
-      object-fill
-    "
+    className="block h-full w-full object-cover lg:object-fill"
   />
 </aside>
 
@@ -220,7 +208,7 @@ export default function Login({ onLogin }) {
                   text-[#14223B]
                 "
               >
-                البريد الإلكتروني
+                الاسم
               </label>
 
               <input
@@ -229,10 +217,10 @@ export default function Login({ onLogin }) {
                 type="text"
                 inputMode="email"
                 dir="rtl"
-                autoComplete="email"
+                autoComplete="username"
                 value={form.email}
                 onChange={handleChange}
-                placeholder="أدخل بريدك الإلكتروني"
+                placeholder="123"
                 aria-invalid={Boolean(errors.email)}
                 aria-describedby={
                   errors.email ? "email-error" : undefined
@@ -448,35 +436,14 @@ export default function Login({ onLogin }) {
             </button>
           </form>
 
-          {import.meta.env.DEV && (
-            <p className="mt-4 text-center text-xs text-[#7C818B]">
-              بيانات تجريبية محلية: البريد 123 وكلمة المرور 123
-            </p>
-          )}
-
-         
-
-{/* REGISTER */}
-<div className="mt-9 text-center">
-  <p className="text-[14px] text-[#7C818B]">
-    ليس لديك حساب؟
-  </p>
-
-  <Link
-to="/project/create"
-    className="
-      mt-2
-      inline-block
-      text-[15px]
-      font-semibold
-      text-[#B8943F]
-      hover:underline
-    "
-  >
-    إنشاء حساب جديد
-  </Link>
-</div>
- 
+          <div className="mt-7 text-center">
+            <Link
+              to="/joinUs"
+              className="text-sm font-semibold text-[#B8943F] hover:underline"
+            >
+              نماذج التطوع واحتضان المشاريع
+            </Link>
+          </div>
 
         </div>
       </main>

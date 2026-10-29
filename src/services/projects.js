@@ -3,6 +3,23 @@ import { projects as defaultProjects } from "../Data/ProjectsData";
 export const PROJECTS_STORAGE_KEY = "qabas-managed-projects";
 const PROJECTS_UPDATED_EVENT = "qabas-projects-updated";
 
+function isValidProjectList(projects) {
+  return (
+    Array.isArray(projects) &&
+    projects.every(
+      (project) =>
+        project &&
+        Number.isFinite(project.id) &&
+        typeof project.title === "string" &&
+        typeof project.category === "string" &&
+        typeof project.description === "string" &&
+        typeof project.image === "string"
+    ) &&
+    new Set(projects.map((project) => project.id)).size ===
+      projects.length
+  );
+}
+
 export function readManagedProjects() {
   const savedProjects = localStorage.getItem(PROJECTS_STORAGE_KEY);
 
@@ -12,19 +29,7 @@ export function readManagedProjects() {
 
   const parsedProjects = JSON.parse(savedProjects);
 
-  if (
-    !Array.isArray(parsedProjects) ||
-    parsedProjects.length !== defaultProjects.length ||
-    parsedProjects.some(
-      (project) =>
-        !project ||
-        typeof project.id !== "number" ||
-        typeof project.title !== "string" ||
-        typeof project.category !== "string" ||
-        typeof project.description !== "string" ||
-        typeof project.image !== "string"
-    )
-  ) {
+  if (!isValidProjectList(parsedProjects)) {
     throw new Error("بيانات المشاريع المحفوظة غير صالحة.");
   }
 
@@ -32,11 +37,10 @@ export function readManagedProjects() {
 }
 
 export function saveManagedProjects(projects) {
-  if (
-    !Array.isArray(projects) ||
-    projects.length !== defaultProjects.length
-  ) {
-    throw new Error("يجب أن تحتوي قائمة المشاريع على 12 مشروعًا.");
+  if (!isValidProjectList(projects)) {
+    throw new Error(
+      "بيانات المشاريع غير صالحة أو تحتوي على أرقام تعريف مكررة."
+    );
   }
 
   localStorage.setItem(

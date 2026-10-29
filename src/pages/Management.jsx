@@ -4,8 +4,11 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowUpLeft,
   Flame,
+  LogOut,
   Pencil,
+  Plus,
   Save,
+  Trash2,
   X,
 } from "lucide-react";
 import useManagedProjects from "../hooks/useManagedProjects";
@@ -77,14 +80,20 @@ function EditAction({ editing, onClick }) {
   );
 }
 
-function ManagedProjectCard({ project, onEdit }) {
+function ManagedProjectCard({ project, onEdit, onDelete }) {
   return (
     <article className="overflow-hidden rounded-[18px] border border-[#E6E5E1] bg-white shadow-[0_3px_8px_rgba(20,34,59,.04)]">
-      <img
-        src={project.image}
-        alt={project.title}
-        className="h-48 w-full object-cover"
-      />
+      {project.image ? (
+        <img
+          src={project.image}
+          alt={project.title}
+          className="h-48 w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-48 items-center justify-center bg-[#F7F0DE] text-2xl font-bold text-[#A8863C]">
+          {project.title}
+        </div>
+      )}
 
       <div className="space-y-4 p-5 text-right">
         <div className="flex items-start justify-between gap-3">
@@ -116,6 +125,15 @@ function ManagedProjectCard({ project, onEdit }) {
             <Pencil size={15} />
             تعديل كل البيانات
           </button>
+          <button
+            type="button"
+            onClick={() => onDelete(project)}
+            aria-label={`حذف مشروع ${project.title}`}
+            className="inline-flex items-center gap-2 rounded-full border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50"
+          >
+            <Trash2 size={15} />
+            حذف
+          </button>
         </div>
       </div>
     </article>
@@ -126,7 +144,11 @@ export default function Management({
   onSaveProfile,
 }) {
   const navigate = useNavigate();
-  const { projects, error: projectsError } = useManagedProjects();
+  const {
+    projects,
+    error: projectsError,
+    saveProjects,
+  } = useManagedProjects();
   const [profile, setProfile] = useState(initialProfile);
   const [editingProfile, setEditingProfile] = useState(false);
   const [message, setMessage] = useState("");
@@ -167,6 +189,26 @@ export default function Management({
     navigate("/project/edit", { state: { project } });
   };
 
+  const deleteProject = (project) => {
+    if (!window.confirm(`هل تريد حذف مشروع «${project.title}»؟`)) {
+      return;
+    }
+
+    try {
+      saveProjects(
+        projects.filter((item) => item.id !== project.id)
+      );
+      setMessage(`تم حذف مشروع «${project.title}».`);
+    } catch (error) {
+      setMessage(error.message || "تعذر حذف المشروع.");
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("qabas-demo-session");
+    navigate("/login", { replace: true });
+  };
+
   return (
     <div
       dir="rtl"
@@ -174,20 +216,31 @@ export default function Management({
     >
       <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 pb-16 pt-10 sm:px-8 lg:gap-8 lg:px-12 lg:pt-14">
         {/* HEADER */}
-        <header className="text-right">
-          <p className="mb-2 inline-flex items-center gap-2 text-[18px] font-semibold text-[#B8943F] sm:text-[21px]">
-            مرحبًا بك
-            <Flame size={22} fill="currentColor" />
-          </p>
+        <header className="flex flex-wrap items-start justify-between gap-4 text-right">
+          <div>
+            <p className="mb-2 inline-flex items-center gap-2 text-[18px] font-semibold text-[#B8943F] sm:text-[21px]">
+              مرحبًا بك
+              <Flame size={22} fill="currentColor" />
+            </p>
 
-          <h1 className="text-[29px] font-bold leading-tight sm:text-[38px] lg:text-[44px]">
-            مرحبًا يا {firstName}
-            <span aria-hidden="true"> 👋</span>
-          </h1>
+            <h1 className="text-[29px] font-bold leading-tight sm:text-[38px] lg:text-[44px]">
+              مرحبًا يا {firstName}
+              <span aria-hidden="true"> 👋</span>
+            </h1>
 
-          <p className="mt-3 text-[14px] leading-7 text-[#818795] sm:text-[16px]">
-            من هنا يمكنك متابعة مشاريعك وتحديث بياناتك وإدارة رحلتك مع قبس.
-          </p>
+            <p className="mt-3 text-[14px] leading-7 text-[#818795] sm:text-[16px]">
+              من هنا يمكنك متابعة مشاريعك وتحديث بياناتها وإدارة رحلة قبس.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={logout}
+            className="inline-flex items-center gap-2 rounded-full border border-[#E2E5EA] bg-white px-4 py-2 text-sm font-semibold text-[#14223B] hover:bg-[#F5F5F5]"
+          >
+            <LogOut size={16} />
+            تسجيل الخروج
+          </button>
         </header>
 
         {/* STATUS MESSAGE */}
@@ -239,9 +292,23 @@ export default function Management({
         <SectionCard
           title="إدارة المشاريع"
           action={
-            <span className="text-sm text-[#818795]">
-              {projects.length} مشروعًا
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-[#818795]">
+                {projects.length} مشروعًا
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  navigate("/project/edit", {
+                    state: { isNewProject: true },
+                  })
+                }
+                className="inline-flex items-center gap-2 rounded-full bg-[#B8943F] px-4 py-2 text-sm font-semibold text-white hover:bg-[#A17D2D]"
+              >
+                <Plus size={16} />
+                إضافة مشروع
+              </button>
+            </div>
           }
         >
           <p className="mb-5 text-sm leading-7 text-[#737B89]">
@@ -254,7 +321,7 @@ export default function Management({
             </p>
           ) : projects.length === 0 ? (
             <p role="status" className="text-sm text-[#737B89]">
-              جارٍ تحميل المشاريع...
+              لا توجد مشاريع حاليًا. يمكنك إضافة مشروع جديد من الزر أعلاه.
             </p>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -263,6 +330,7 @@ export default function Management({
                   key={project.id}
                   project={project}
                   onEdit={editProject}
+                  onDelete={deleteProject}
                 />
               ))}
             </div>

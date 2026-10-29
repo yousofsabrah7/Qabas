@@ -2,31 +2,23 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FiArrowRight, FiPlusCircle, FiTrash2, FiUpload, FiX } from "react-icons/fi";
 import ProjectPreviewModal from "../components/ProjectPreviewModal";
-import sukoonProduct from "../assets/project-edit/sukoon-product.png";
-import sukoonDetail from "../assets/project-edit/sukoon-detail.png";
 import {
   readManagedProjects,
   saveManagedProjects,
 } from "../services/projects";
 
-const STORAGE_KEY = "qabas-project-edit";
-const defaultProject = {
-  name: "سكون",
-  englishName: "SUKOON",
-  field: "منتجات يدوية",
-  stage: "مرحلة النمو",
-  idea: "شموع عطرية مصنوعة بعناية لتمنح كل زاوية دفئًا وهدوءًا.",
-  description: "سكون مشروع لصناعة الشموع العطرية والمنتجات اليدوية، يجمع بين التصميم البسيط والروائح الهادئة لصناعة لحظات مميزة في كل بيت.",
-  website: "https://sukoon.com",
-  instagram: "https://instagram.com",
-  facebook: "https://facebook.com",
-  whatsapp: "+970 599 123 456",
+const emptyProject = {
+  name: "",
+  englishName: "",
+  field: "",
+  stage: "",
+  idea: "",
+  description: "",
+  website: "",
+  instagram: "",
+  facebook: "",
+  whatsapp: "",
 };
-const defaultTeam = [
-  { name: "سارة محمد", role: "مؤسس" },
-  { name: "ليان أحمد", role: "تصميم" },
-];
-const defaultImages = [sukoonProduct, sukoonDetail];
 const categories = ["منتجات يدوية", "التكنولوجيا", "التعليم", "الصحة", "التجارة", "الزراعة", "التصميم", "أخرى"];
 const inputStyle = "h-11 w-full rounded-lg border border-[#D9DDE2] bg-white px-3 text-[13px] text-[#14223B] outline-none placeholder:text-[#A1A8B3] focus:border-[#B8943F] focus:ring-2 focus:ring-[#B8943F]/15";
 const textareaStyle = `${inputStyle} h-auto min-h-[84px] resize-y py-3 leading-7`;
@@ -127,58 +119,26 @@ export default function ProjectEdit({ projectData, onSaveProject }) {
   const navigate = useNavigate();
   const location = useLocation();
   const selectedProject = projectData || location.state?.project;
-  const [form, setForm] = useState(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-      return {
-        ...defaultProject,
-        ...(saved?.form || {}),
-        ...(selectedProject
-          ? {
-              name: selectedProject.title,
-              englishName: selectedProject.englishName || "",
-              field: selectedProject.category,
-              stage: selectedProject.stage || "",
-              idea: selectedProject.idea || selectedProject.about || "",
-              description: selectedProject.description,
-              website: selectedProject.website || "",
-              instagram: selectedProject.instagram || "",
-              facebook: selectedProject.facebook || "",
-              whatsapp: selectedProject.whatsapp || "",
-            }
-          : {}),
-        ...(projectData?.form || {}),
-      };
-    } catch {
-      return {
-        ...defaultProject,
-        ...(selectedProject
-          ? {
-              name: selectedProject.title,
-              englishName: selectedProject.englishName || "",
-              field: selectedProject.category,
-              stage: selectedProject.stage || "",
-              idea: selectedProject.idea || selectedProject.about || "",
-              description: selectedProject.description,
-              website: selectedProject.website || "",
-              instagram: selectedProject.instagram || "",
-              facebook: selectedProject.facebook || "",
-              whatsapp: selectedProject.whatsapp || "",
-            }
-          : {}),
-      };
-    }
-  });
-  const [team, setTeam] = useState(() => {
-    try {
-      if (selectedProject) return selectedProject.team || [];
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null")?.team || defaultTeam;
-    }
-    catch { return defaultTeam; }
-  });
-  const [logo, setLogo] = useState(
-    selectedProject ? selectedProject.logo || null : sukoonProduct
-  );
+  const [form, setForm] = useState(() => ({
+    ...emptyProject,
+    ...(selectedProject
+      ? {
+          name: selectedProject.title,
+          englishName: selectedProject.englishName || "",
+          field: selectedProject.category,
+          stage: selectedProject.stage || "",
+          idea: selectedProject.idea || selectedProject.about || "",
+          description: selectedProject.description,
+          website: selectedProject.website || "",
+          instagram: selectedProject.instagram || "",
+          facebook: selectedProject.facebook || "",
+          whatsapp: selectedProject.whatsapp || "",
+        }
+      : {}),
+    ...(projectData?.form || {}),
+  }));
+  const [team, setTeam] = useState(() => selectedProject?.team || []);
+  const [logo, setLogo] = useState(selectedProject?.logo || null);
   const [images, setImages] = useState(
     selectedProject
       ? selectedProject.images?.length
@@ -186,7 +146,7 @@ export default function ProjectEdit({ projectData, onSaveProject }) {
         : selectedProject.image
           ? [selectedProject.image]
           : []
-      : defaultImages
+      : []
   );
   const [errors, setErrors] = useState({});
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -241,22 +201,24 @@ export default function ProjectEdit({ projectData, onSaveProject }) {
       if (onSaveProject) {
         await onSaveProject(payload);
         setMessage("تم حفظ التعديلات بنجاح.");
-      } else if (selectedProject?.id) {
+      } else {
         const currentProjects = readManagedProjects();
+        const nextProject = {
+          ...payload,
+          id:
+            selectedProject?.id ??
+            Math.max(0, ...currentProjects.map((project) => project.id)) + 1,
+        };
         saveManagedProjects(
-          currentProjects.map((project) =>
-            project.id === selectedProject.id
-              ? { ...project, ...payload }
-              : project
-          )
+          selectedProject
+            ? currentProjects.map((project) =>
+                project.id === selectedProject.id
+                  ? { ...project, ...nextProject }
+                  : project
+              )
+            : [...currentProjects, nextProject]
         );
         navigate("/management");
-      } else {
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify({ form: payload, team, logo: savedLogo, images: savedImages })
-        );
-        setMessage("تم حفظ البيانات محليًا على هذا المتصفح.");
       }
     } catch (err) {
       setMessage(
@@ -274,9 +236,13 @@ export default function ProjectEdit({ projectData, onSaveProject }) {
         <header className="mb-8 text-right">
           <div className="flex items-center gap-3">
             <button type="button" onClick={() => navigate(-1)} aria-label="رجوع" className="rounded-full p-2 hover:bg-[#F0EEE9]"><FiArrowRight size={22} /></button>
-            <h1 className="text-3xl font-bold sm:text-4xl">تعديل المشروع</h1>
+            <h1 className="text-3xl font-bold sm:text-4xl">
+              {selectedProject ? "تعديل المشروع" : "إضافة مشروع"}
+            </h1>
           </div>
-          <p className="mt-2 text-sm text-[#777F8B]">عدّل معلومات مشروعك، وراجع أحدث التغييرات قبل نشرها.</p>
+          <p className="mt-2 text-sm text-[#777F8B]">
+            أدخل جميع بيانات المشروع، ويمكنك تعديلها لاحقًا.
+          </p>
         </header>
 
         <form onSubmit={save} className="space-y-5" noValidate>
@@ -304,6 +270,15 @@ export default function ProjectEdit({ projectData, onSaveProject }) {
                   {categories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
                 {errors.field && <p className="mt-1 text-xs text-red-600">{errors.field}</p>}
+              </div>
+              <div>
+                <Label>مرحلة المشروع</Label>
+                <input
+                  className={inputStyle}
+                  value={form.stage || ""}
+                  onChange={e => update("stage", e.target.value)}
+                  placeholder="مثال: مرحلة النمو"
+                />
               </div>
               <div className="lg:col-span-2">
                 <Label required>فكرة المشروع</Label>
@@ -353,7 +328,13 @@ export default function ProjectEdit({ projectData, onSaveProject }) {
           {message && <div role="status" className="flex items-center justify-between gap-3 rounded-lg border border-[#E9D9B3] bg-[#FFF9EA] px-4 py-3 text-sm text-[#826628]">{message}<button type="button" aria-label="إغلاق الرسالة" onClick={() => setMessage("")}><FiX size={16} /></button></div>}
           <div className="flex flex-wrap gap-4 pt-1">
             <button type="button" onClick={() => setPreviewOpen(true)} className="min-w-[155px] rounded-xl border border-[#14223B] bg-white px-7 py-3 text-sm font-semibold text-[#14223B] hover:bg-[#F2F4F7]">معاينة المشروع</button>
-            <button type="submit" disabled={saving} className="min-w-[155px] rounded-xl bg-[#B8943F] px-7 py-3 text-sm font-semibold text-white hover:bg-[#A17D2D] disabled:opacity-60">{saving ? "جاري الحفظ..." : "حفظ التغييرات"}</button>
+            <button type="submit" disabled={saving} className="min-w-[155px] rounded-xl bg-[#B8943F] px-7 py-3 text-sm font-semibold text-white hover:bg-[#A17D2D] disabled:opacity-60">
+              {saving
+                ? "جارٍ الحفظ..."
+                : selectedProject
+                  ? "حفظ التعديلات"
+                  : "إضافة المشروع"}
+            </button>
           </div>
         </form>
       </main>
