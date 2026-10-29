@@ -1,16 +1,13 @@
 
-import React, { useState } from "react";
 import journeyHero from "../assets/journey-hero.png";
 import { useNavigate } from "react-router-dom";
 
 import {
   FiArrowLeft,
-  FiArrowLeftCircle,
   FiCheck,
   FiUsers,
   FiAward,
   FiZap,
-  FiHelpCircle,
   FiFileText,
   FiSend,
   FiStar,
@@ -30,7 +27,9 @@ const joinOptions = [
       "المشاركة في الفعاليات والتدريبات",
       " فرص للتعلّم وتطوير المهارات",
     ],
-    button: "انضم كعضو",
+    button: "نموذج التطوع",
+    formUrl:
+      "https://docs.google.com/forms/d/e/1FAIpQLSfJK7sgK3qHP3arH2xb745EQrPrBkpjH5i5WG9FdumX7yNiFg/viewform?pli=1",
   },
   {
     id: "incubation",
@@ -44,7 +43,9 @@ const joinOptions = [
       "مراجعة فكرتك ومقابلة قصيرة",
       "دعم ومسار مخصص لمشروعك",
     ],
-    button: "انضم لاحتضان مشروعك",
+    button: "نموذج احتضان المشاريع",
+    formUrl:
+      "https://docs.google.com/forms/d/e/1FAIpQLSe0QRjXtkVMMqI3IJD3qHngBGf2txKnBYFjrDfNm9whFMKxUQ/viewform?pli=1",
   },
   {
     id: "project",
@@ -168,14 +169,26 @@ function JoinCard({ option, onSelect }) {
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => onSelect(option)}
-        className="mt-7 flex w-full items-center justify-center gap-2 rounded-lg bg-[#B8943F] px-4 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#9A7A2E]"
-      >
-        {option.button}
-        <FiArrowLeft size={16} />
-      </button>
+      {option.formUrl ? (
+        <a
+          href={option.formUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-7 flex w-full items-center justify-center gap-2 rounded-lg bg-[#B8943F] px-4 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#9A7A2E]"
+        >
+          {option.button}
+          <FiArrowLeft size={16} />
+        </a>
+      ) : (
+        <button
+          type="button"
+          onClick={() => onSelect(option)}
+          className="mt-7 flex w-full items-center justify-center gap-2 rounded-lg bg-[#B8943F] px-4 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#9A7A2E]"
+        >
+          {option.button}
+          <FiArrowLeft size={16} />
+        </button>
+      )}
     </article>
   );
 }
@@ -219,7 +232,7 @@ function SectionHeading({ children, description }) {
   );
 }
 
-function WhichPath({ onSelect }) {
+function WhichPath() {
   return (
     <section className="bg-[#F8F6F0] px-6 pb-16 pt-6 sm:px-10 lg:px-20">
       <div className="mx-auto max-w-[1280px]">
@@ -228,9 +241,10 @@ function WhichPath({ onSelect }) {
         </SectionHeading>
 
         <div className="mt-9 grid grid-cols-1 gap-5 md:grid-cols-2">
-          <button
-            type="button"
-            onClick={() => onSelect(joinOptions[0])}
+          <a
+            href={joinOptions[0].formUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center gap-4 rounded-2xl border border-[#E8E8E8] bg-white p-5 text-right transition-all hover:border-[#B8943F] hover:shadow-md"
           >
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#F5F0E4] text-[#A68539]">
@@ -247,11 +261,12 @@ function WhichPath({ onSelect }) {
             </span>
 
             <FiChevronLeft className="text-[#B8943F]" />
-          </button>
+          </a>
 
-          <button
-            type="button"
-            onClick={() => onSelect(joinOptions[1])}
+          <a
+            href={joinOptions[1].formUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center gap-4 rounded-2xl border border-[#E8E8E8] bg-white p-5 text-right transition-all hover:border-[#B8943F] hover:shadow-md"
           >
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#F5F0E4] text-[#A68539]">
@@ -268,7 +283,7 @@ function WhichPath({ onSelect }) {
             </span>
 
             <FiChevronLeft className="text-[#B8943F]" />
-          </button>
+          </a>
         </div>
       </div>
     </section>
@@ -321,97 +336,12 @@ function RegistrationSteps() {
   );
 }
 
-function JoinCTA() {
-  return (
-    <section className="relative flex min-h-[270px] items-center overflow-hidden bg-[#14223B] px-6 py-12 sm:px-10 lg:px-20">
-      <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat opacity-35"
-        style={{
-          backgroundImage: "url('/images/join-cta.png')",
-        }}
-        aria-hidden="true"
-      />
-
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-[#14223B] via-[#14223B]/75 to-transparent" />
-
-      <div className="relative z-10 mx-auto w-full max-w-[1280px]">
-        <div className="max-w-[500px] text-right">
-          <h2 className="text-3xl font-bold text-[#F8F4EC] sm:text-[40px]">
-            هل لديك شرارة؟
-          </h2>
-
-          <p className="mt-3 text-base leading-7 text-[#D4A017]">
-            فكرة صغيرة قد تكون بداية لشيء كبير.
-          </p>
-
-          <a
-            href="#join-options"
-            className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#B8943F] px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-[#9A7A2E]"
-          >
-            انضم إلى قبس
-            <FiArrowLeft size={17} />
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SelectionNotice({ selected, onClose }) {
-  if (!selected) return null;
-
-  return (
-    <div
-      role="status"
-      className="fixed bottom-5 left-5 right-5 z-50 mx-auto max-w-[460px] rounded-xl border border-[#E5D8B8] bg-white p-5 shadow-xl"
-    >
-      <div className="flex items-start gap-3">
-        <FiHelpCircle
-          size={22}
-          className="shrink-0 text-[#B8943F]"
-        />
-
-        <div className="flex-1">
-          <h3 className="font-bold text-[#192A4A]">
-            {selected.title}
-          </h3>
-          <p className="mt-1 text-sm leading-6 text-[#4F5666]">
-            اخترت هذا المسار بنجاح. رح نربط زر التسجيل
-            بصفحته الخاصة في الخطوة القادمة.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={onClose}
-          className="text-sm font-bold text-[#4F5666] hover:text-[#192A4A]"
-          aria-label="إغلاق"
-        >
-          ✕
-        </button>
-      </div>
-    </div>
-  );
-}
-
-
 const JoinUs = () => {
-  const [selectedOption, setSelectedOption] = useState(null);
   const navigate = useNavigate();
 
 
 const handleSelect = (option) => {
-  if (option.id === "project") {
-    navigate("/login");
-    return;
-  }
-
-  if (option.id === "incubation") {
-    navigate("/project/create");
-    return;
-  }
-
-  setSelectedOption(option);
+  if (option.id === "project") navigate("/login");
 };
 
 
@@ -424,14 +354,9 @@ const handleSelect = (option) => {
 
       <JoinOptions onSelect={handleSelect} />
 
-      <WhichPath onSelect={handleSelect} />
+      <WhichPath />
 
       <RegistrationSteps />
-
-      <SelectionNotice
-        selected={selectedOption}
-        onClose={() => setSelectedOption(null)}
-      />
     </div>
   );
 };
