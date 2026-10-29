@@ -2,9 +2,12 @@ import React from "react";
 import GoldButton from "./GoldButton";
 import SectionHeading from "./SectionHeading";
 import ProjectCard from "./ProjectCard";
-import { projects as projectItems } from "../../Data/HomeData";
+import useManagedProjects from "../../hooks/useManagedProjects";
 
 export default function HomeProjects() {
+  const { projects } = useManagedProjects();
+  const projectItems = projects.slice(0, 3);
+
   return (
 <div className="relative bg-[#F8F6F0] w-full overflow-hidden px-6 py-12 sm:p-10">
         <div className="content relative z-10 w-full">

@@ -1,11 +1,7 @@
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo } from "react";
 
 import ProjectCard from "./ProjectCard";
-import { projects } from "../../Data/ProjectsData";
-
-const PAGE_SIZE = 6;
-const LOAD_MORE_COUNT = 3;
 
 // توحيد النصوص العربية
 const normalizeText = (text) => {
@@ -23,9 +19,8 @@ const normalizeText = (text) => {
 export default function ProjectsGrid({
   search = "",
   selectedField = "",
+  projects = [],
 }) {
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-
   // البحث بالاسم + التصفية حسب المجال
   const filteredProjects = useMemo(() => {
     const query = normalizeText(search);
@@ -47,31 +42,9 @@ export default function ProjectsGrid({
 
       return matchesSearch && matchesField;
     });
-  }, [search, selectedField]);
+  }, [projects, search, selectedField]);
 
-  // إعادة عدد المشاريع الظاهرة عند تغيير البحث أو المجال
-  useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
-  }, [search, selectedField]);
-
-  const visibleProjects = filteredProjects.slice(
-    0,
-    visibleCount
-  );
-
-  const remaining = Math.max(
-    filteredProjects.length - visibleCount,
-    0
-  );
-
-  const handleLoadMore = () => {
-    setVisibleCount((count) =>
-      Math.min(
-        count + LOAD_MORE_COUNT,
-        filteredProjects.length
-      )
-    );
-  };
+  const visibleProjects = filteredProjects;
 
   return (
     <section
@@ -167,36 +140,6 @@ export default function ProjectsGrid({
         >
           ما لقينا مشاريع مطابقة لبحثك أو المجال المحدد.
         </p>
-      )}
-
-      {/* LOAD MORE BUTTON */}
-      {remaining > 0 && (
-        <div className="mt-9 flex justify-center sm:mt-12">
-          <button
-            type="button"
-            onClick={handleLoadMore}
-            className="
-              rounded-full
-              border
-              border-[#D8BC7A]
-              bg-white
-              px-7
-              py-3
-              text-[14px]
-              font-semibold
-              text-[#B7964A]
-              transition-colors
-              duration-300
-              hover:bg-[#B7964A]
-              hover:text-white
-              sm:px-9
-              sm:py-4
-              sm:text-[16px]
-            "
-          >
-            تحميل المزيد ({remaining})
-          </button>
-        </div>
       )}
     </section>
   );

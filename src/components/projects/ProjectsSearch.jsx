@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { projects } from "../../Data/ProjectsData";
 
 const fields = [
   "جميع المجالات",
@@ -16,10 +15,17 @@ const fields = [
 export default function ProjectFilters({
   onSearchChange,
   onFieldChange,
+  projects = [],
 }) {
   const [search, setSearch] = useState("");
   const [selectedField, setSelectedField] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const projectFields = projects
+    .map((project) => project.category)
+    .filter(Boolean);
+  const availableFields = [
+    ...new Set([...fields, ...projectFields]),
+  ];
 
   const handleFieldSelect = (field) => {
     const value = field === "جميع المجالات" ? "" : field;
@@ -122,7 +128,7 @@ export default function ProjectFilters({
               md:w-max
             "
           >
-            {fields.map((field) => (
+            {availableFields.map((field) => (
               <button
                 key={field}
                 type="button"
